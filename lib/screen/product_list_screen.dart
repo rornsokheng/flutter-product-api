@@ -1,5 +1,5 @@
 import 'package:basic_flutter/helper/widget/cart_manager.dart';
-import 'package:basic_flutter/main.dart';
+import 'package:basic_flutter/helper/widget/product_cart.dart';
 import 'package:basic_flutter/model/product.dart';
 import 'package:basic_flutter/screen/cart_screen.dart';
 import 'package:basic_flutter/screen/product_detail_screen.dart';
