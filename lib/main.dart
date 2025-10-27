@@ -1,3 +1,5 @@
+import 'package:basic_flutter/services/telegram_service.dart';
+import 'package:basic_flutter/model/product.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -6,18 +8,13 @@ void main() {
   runApp(const MyApp());
 }
 
-// CONFIGURATION - Replace with your Telegram Bot Token and Chat ID
-const String TELEGRAM_BOT_TOKEN =
-    '8420874385:AAG89KOYSxNNtLQCqrT3Uwtc3U6IxKhikoQ';
-const String TELEGRAM_CHAT_ID = '1084261917';
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Luxe Store',
+      title: 'Smos Store',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         scaffoldBackgroundColor: const Color(0xFFF8F9FA),
@@ -45,57 +42,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Product Model
-class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String description;
-  final String category;
-  final String image;
-  final Rating rating;
 
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.description,
-    required this.category,
-    required this.image,
-    required this.rating,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      title: json['title'],
-      price: json['price'].toDouble(),
-      description: json['description'],
-      category: json['category'],
-      image: json['image'],
-      rating: Rating.fromJson(json['rating']),
-    );
-  }
-}
-
-class Rating {
-  final double rate;
-  final int count;
-
-  Rating({required this.rate, required this.count});
-
-  factory Rating.fromJson(Map<String, dynamic> json) {
-    return Rating(rate: json['rate'].toDouble(), count: json['count']);
-  }
-}
-
-// Cart Item Model
-class CartItem {
-  final Product product;
-  int quantity;
-
-  CartItem({required this.product, this.quantity = 1});
-}
 
 // Cart Manager (Singleton)
 class CartManager {
@@ -142,58 +89,6 @@ class CartManager {
 
   void clearCart() {
     _cartItems.clear();
-  }
-}
-
-// Telegram Service
-class TelegramService {
-  static Future<bool> sendOrderToTelegram({
-    required String name,
-    required String email,
-    required String address,
-    required String city,
-    required String zip,
-    required List<CartItem> items,
-    required double total,
-  }) async {
-    try {
-      String message = '🛍️ *NEW ORDER RECEIVED*\n\n';
-      message += '👤 *Customer Information:*\n';
-      message += 'Name: $name\n';
-      message += 'Email: $email\n';
-      message += 'Address: $address\n';
-      message += 'City: $city\n';
-      message += 'ZIP: $zip\n\n';
-      message += '📦 *Order Details:*\n';
-
-      for (var item in items) {
-        message += '• ${item.product.title}\n';
-        message +=
-            '  Qty: ${item.quantity} x \$${item.product.price.toStringAsFixed(2)} = \$${(item.product.price * item.quantity).toStringAsFixed(2)}\n\n';
-      }
-
-      message += '💰 *Total: \$${total.toStringAsFixed(2)}*\n';
-      message += '\n📅 ${DateTime.now().toString().split('.')[0]}';
-
-      final url = Uri.parse(
-        'https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage',
-      );
-
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'chat_id': TELEGRAM_CHAT_ID,
-          'text': message,
-          'parse_mode': 'Markdown',
-        }),
-      );
-
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Error sending to Telegram: $e');
-      return false;
-    }
   }
 }
 
